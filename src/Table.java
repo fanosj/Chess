@@ -1,3 +1,5 @@
+import javax.naming.PartialResultException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Table {
@@ -48,16 +50,24 @@ public class Table {
         return false;
     }
     public void movePieceTo(Piece piece, int toX, int toY) {
-        List<Piece> tempPieces = List.copyOf(pieces);
+        List<Piece> tempPieces = new ArrayList<>(pieces);
         if(!piece.canMove(toX, toY)) {
             return;
         }
-        if(isInCheck(piece.isWhite)) {
-            pieces = tempPieces;
-            return;
-        }
+        int oldx = piece.getC().getX();
+        int oldy = piece.getC().getY();
         boolean deleted = deleteAt(toX, toY);
         piece.setC(new Coordinate(toX, toY));
+        if(isInCheck(piece.isWhite)) {
+            pieces = tempPieces;
+            piece.setC(new Coordinate(oldx, oldy));
+            return;
+        }
+        if(isInCheck(!piece.isWhite)) {
+            if(isCheckMate(!piece.isWhite)) {
+                System.out.println((piece.isWhite ? "White" : "Black") + " wins by checkmate!");
+            }
+        }
     }
     public void listPieces() {
         for (Piece piece : pieces) {
@@ -92,5 +102,31 @@ public class Table {
             }
         }
         return false;
+    }
+
+    public boolean isCheckMate(boolean isWhite){
+        for(Piece piece :pieces) {
+            if(piece.isWhite == isWhite) {
+                for(int x=0; x<column; x++) {
+                    for(int y=0; y<row; y++) {
+                        List<Piece> tempPieces = new ArrayList<>(pieces);
+                        int oldx = piece.getC().getX();
+                        int oldy = piece.getC().getY();
+                        if(piece.canMove(x,y)) {
+                            boolean deleted = deleteAt(x, y);
+                            piece.setC(new Coordinate(x, y));
+                            if(!isInCheck(isWhite)) {
+                                pieces = tempPieces;
+                                piece.setC(new Coordinate(oldx, oldy));
+                                return false;
+                            }
+                            pieces = tempPieces;
+                            piece.setC(new Coordinate(oldx, oldy));
+                        }
+                    }
+                }
+            }
+        }
+        return true;
     }
 }
