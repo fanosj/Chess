@@ -7,10 +7,12 @@ public class Bishop extends Piece {
         if(Math.abs(toX-c.getX()) == Math.abs(toY-c.getY())) {
             int xdir = toX-c.getX() > 0 ? 1 : -1;
             int ydir = toY-c.getY() > 0 ? 1 : -1;
-            while(toX + xdir != c.getX()) {
-                if(toX != c.getX() && table.isTherePieceAt(toX, toY)) return false;
-                toX -= xdir;
-                toY -= ydir;
+            int Xcopy = c.getX();
+            int Ycopy = c.getY();
+            while(Xcopy + xdir != toX) {
+                Xcopy += xdir;
+                Ycopy += ydir;
+                if(table.isTherePieceAt(Xcopy, Ycopy)) return false;
             }
             if(!table.isTherePieceAt(toX, toY) || !isSameColor(table.getPieceAt(toX, toY))) {
                 return true;

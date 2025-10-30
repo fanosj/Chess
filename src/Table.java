@@ -2,12 +2,20 @@ import java.util.List;
 
 public class Table {
     List<Piece> pieces;
-    public int row;
-    public int column;
-    public Table(List<Piece> pieces, int row, int column) {
+    private int row;
+    private int column;
+    public boolean isWhiteTurn = true;
+    public Table(List<Piece> pieces, int row, int column, boolean whiteTurn) {
         this.pieces = pieces;
         this.row = row;
         this.column = column;
+        this.isWhiteTurn = whiteTurn;
+    }
+    int getRow() {
+        return row;
+    }
+    int getColumn() {
+        return column;
     }
     public boolean isTherePieceAt(int x, int y) {
         for (Piece piece : pieces) {
@@ -17,6 +25,7 @@ public class Table {
         }
         return false;
     }
+
     public Piece getPieceAt(int x, int y) {
         if(x < 0 || x >= column || y < 0 || y >= row) {
             return null;
@@ -28,6 +37,7 @@ public class Table {
         }
         return null;
     }
+
     public boolean deleteAt(int x, int y) {
         for (Piece piece : pieces) {
             if (piece.getC().getX() == x && piece.getC().getY() == y) {
@@ -37,8 +47,13 @@ public class Table {
         }
         return false;
     }
-    public void MovePiece(Piece piece, int toX, int toY) {
+    public void movePieceTo(Piece piece, int toX, int toY) {
+        List<Piece> tempPieces = List.copyOf(pieces);
         if(!piece.canMove(toX, toY)) {
+            return;
+        }
+        if(isInCheck(piece.isWhite)) {
+            pieces = tempPieces;
             return;
         }
         boolean deleted = deleteAt(toX, toY);
@@ -49,18 +64,33 @@ public class Table {
             System.out.println("Piece at (" + piece.getC().getX() + ", " + piece.getC().getY() + ")");
         }
     }
-    public void drawTable(){
-        for(int i = 0; i < row; i++) {
-            for(int j = 0; j < column; j++) {
-                Piece piece = getPieceAt(i, j);
-                if(piece != null) {
-                    piece.drawPiece();
-                } else {
-                    System.out.print(". ");
-                }
-            }
-            System.out.println();
-        }
+
+    public void drawTable() {
+        javax.swing.SwingUtilities.invokeLater(() -> {
+            javax.swing.JFrame frame = new javax.swing.JFrame("Chess Board");
+            frame.setDefaultCloseOperation(javax.swing.JFrame.EXIT_ON_CLOSE);
+            frame.setSize(800, 800);
+            frame.add(new ChessBoardPanel(this));
+            frame.setVisible(true);
+        });
     }
 
+    public boolean isInCheck(boolean isWhite) {
+        Piece king = null;
+        for(Piece piece : pieces) {
+            if(piece instanceof King && piece.getIsWhite() == isWhite) {
+                king = piece;
+                break;
+            }
+        }
+        if(king == null) return false;
+        for(Piece piece : pieces) {
+            if(piece.getIsWhite() != isWhite) {
+                if(piece.canMove(king.getC().getX(), king.getC().getY())) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 }

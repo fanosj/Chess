@@ -5,32 +5,19 @@ public class Queen extends Piece {
 
     @Override
     public boolean canMove(int toX, int toY) {
-        if(toX == c.getX() && toY == c.getY()){
-            int xdir =  toX-c.getX() > 0 ? 1 : toX-c.getX() < 0 ? -1 : 0;
-            int ydir = toY-c.getY() > 0 ? 1 : toY-c.getY() < 0 ? -1 : 0;
-            while(toX + xdir != c.getX() || toY + ydir != c.getY()) {
-                if((toX != c.getX() || toY != c.getY()) && table.isTherePieceAt(toX, toY)) return false;
-                toX -= xdir;
-                toY -= ydir;
+        if((toX == c.getX() || toY == c.getY()) || Math.abs(toX-c.getX()) == Math.abs(toY-c.getY())){
+            int xdir =  Integer.signum(toX-c.getX());
+            int ydir =  Integer.signum(toY-c.getY());
+            int Xcopy = c.getX();
+            int Ycopy = c.getY();
+            while(Xcopy + xdir != toX || Ycopy + ydir != toY) {
+                Xcopy += xdir;
+                Ycopy += ydir;
+                if(table.isTherePieceAt(Xcopy, Ycopy)) return false;
             }
-            if(!table.isTherePieceAt(toX, toY) || !isSameColor(table.getPieceAt(toX, toY))) {
-                return true;
-            }
-        }
-        if(Math.abs(toX-c.getX()) == Math.abs(toY-c.getY())) {
-            int xdir = toX-c.getX() > 0 ? 1 : -1;
-            int ydir = toY-c.getY() > 0 ? 1 : -1;
-            while(toX + xdir != c.getX()) {
-                if(toX != c.getX() && table.isTherePieceAt(toX, toY)) return false;
-                toX -= xdir;
-                toY -= ydir;
-            }
-            if(!table.isTherePieceAt(toX, toY) || !isSameColor(table.getPieceAt(toX, toY))) {
-                return true;
-            }
+            return !table.isTherePieceAt(toX, toY) || !isSameColor(table.getPieceAt(toX, toY));
         }
         return false;
-
     }
 
     @Override

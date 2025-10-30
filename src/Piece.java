@@ -2,7 +2,7 @@ public abstract class Piece {
     protected Coordinate c;
     protected boolean isWhite;
     Table table;
-    public Piece(Coordinate c, Boolean isWhite, Table table) {
+    protected Piece(Coordinate c, Boolean isWhite, Table table) {
         this.table = table;
         this.c = c;
         this.isWhite = isWhite;
