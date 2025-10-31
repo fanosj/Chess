@@ -1,8 +1,6 @@
 public class King extends Piece{
-    public boolean moved;
-    protected King(Coordinate c, Boolean isWhite, Table table, boolean moved) {
+    protected King(Coordinate c, Boolean isWhite, Table table) {
         super(c, isWhite, table);
-        this.moved = moved;
     }
 
     @Override

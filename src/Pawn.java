@@ -1,8 +1,6 @@
 public class Pawn extends Piece {
-    private boolean moved;
-    public Pawn(Coordinate c, Boolean isWhite,Table table, boolean moved) {
+    public Pawn(Coordinate c, Boolean isWhite,Table table) {
         super(c, isWhite,table);
-        this.moved = moved;
     }
     public boolean getMoved() {return moved;}
     public void setMoved(boolean moved) {this.moved = moved;}
@@ -15,11 +13,9 @@ public class Pawn extends Piece {
                 if(table.isTherePieceAt(c.getX(), toYcopy)) return false;
                 toYcopy -= direction;
             }
-            moved = true;
             return true;
         }
         else if(table.isTherePieceAt(toX,toY) && toY-c.getY() == direction && Math.abs(toX-c.getX()) == 1 && isWhite != table.getPieceAt(toX,toY).isWhite) {
-            moved = true;
             return true;
         }
         return false;

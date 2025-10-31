@@ -2,12 +2,15 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ChessBoardPanel extends JPanel {
     private Table table;
     private int squareSize;
     private int selectedX = -1;
     private int selectedY = -1;
+    private List<Coordinate> highlightedSquares = new ArrayList<>();
 
     public ChessBoardPanel(Table table) {
         this.table = table;
@@ -18,13 +21,14 @@ public class ChessBoardPanel extends JPanel {
             public void mouseClicked(MouseEvent e) {
                 int x = e.getX() / squareSize;
                 int y = e.getY() / squareSize;
-
                 if(selectedX == -1) {
-                    if(table.isTherePieceAt(x, y)) {
+                    if(table.isTherePieceAt(x, y) && table.getPieceAt(x,y).getIsWhite() == table.isWhiteTurn) {
+                        highlightedSquares = table.getAllMoves(table.getPieceAt(x, y));
                         selectedX = x;
                         selectedY = y;
                     }
                 } else {
+                    highlightedSquares.clear();
                     table.movePieceTo(table.getPieceAt(selectedX, selectedY), x, y);
                     selectedX = -1;
                     selectedY = -1;
@@ -60,6 +64,12 @@ public class ChessBoardPanel extends JPanel {
                 if(selectedX == i && selectedY == j) {
                     g.setColor(new Color(0, 255, 0, 100));
                     g.fillRect(x, y, squareSize, squareSize);
+                }
+                for(Coordinate coord : highlightedSquares) {
+                    if (coord.getX() == i && coord.getY() == j) {
+                        g.setColor(new Color(255, 255, 0, 100));
+                        g.fillRect(x, y, squareSize, squareSize);
+                    }
                 }
             }
         }
