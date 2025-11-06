@@ -20,6 +20,16 @@ public class Rook extends Piece {
         }
         return false;
     }
+    public boolean canCastle(int toX, int toY) {
+        if(!moved && c.getY() == toY && (Math.abs(toX - c.getX()) == 3 || Math.abs(toX-c.getX()) == 2)) {
+            for(Piece p : table.pieces) {
+                if(p instanceof King && p.isWhite == isWhite && !p.moved && !table.isInCheck(isWhite)) {
+                    int xdir = toX > c.getX() ? 1 : -1;
+                }
+            }
+        }
+        return true;
+    }
 
     @Override
     public void drawPiece() {

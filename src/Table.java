@@ -64,23 +64,24 @@ public class Table {
     //checks if the move is valid, if realMove is false, it only checks if the move is valid without
     //actually moving the piece, otherwise it moves the piece and returns if the move is valid
     private boolean moveCheck(Piece piece, int toX, int toY,boolean realMove) {
-        //needed, so that a piece can't move to the same spot
-        if(piece.getC().getX() == toX && piece.getC().getY() == toY) return false;
-        //store current pieces to revert back if move is invalid, not the prettiest :(
-        List<Piece> tempPieces = new ArrayList<>(pieces);
+        boolean result = simulateMove(piece, toX, toY);
+        if(result && realMove) {
+            deleteAt(toX, toY);
+            piece.setC(new Coordinate(toX, toY));
+        }
+        return result;
+    }
+    public boolean simulateMove(Piece piece, int toX, int toY) {
         if(!piece.canMove(toX, toY)) return false;
+        List<Piece> tempPieces = new ArrayList<>(pieces);
         int oldx = piece.getC().getX();
         int oldy = piece.getC().getY();
         deleteAt(toX, toY);
         piece.setC(new Coordinate(toX, toY));
         boolean moveValid = isInCheck(piece.isWhite);
-        //both outcomes need move revert, so it was easier to do it this way
-        if(!moveValid || !realMove) {
-            piece.setC(new Coordinate(oldx, oldy));
-            pieces = tempPieces;
-            return moveValid;
-        }
-        return true;
+        piece.setC(new Coordinate(oldx, oldy));
+        pieces = tempPieces;
+        return !moveValid;
     }
     //it only exists for testing purposes
     public void listPieces() {
@@ -123,7 +124,7 @@ public class Table {
         List<Coordinate> moves = new ArrayList<>();
         for(int x=0; x<column; x++) {
             for(int y=0; y<row; y++) {
-                if(moveCheck(piece,x,y,false)) {
+                if(simulateMove(piece, x, y)) {
                     moves.add(new Coordinate(x,y));
                 }
             }
@@ -139,19 +140,10 @@ public class Table {
                 //get all possible moves for the piece
                 List<Coordinate> moves = getAllMoves(piece);
                 for(Coordinate move : moves) {
-                    List<Piece> tempPieces = new ArrayList<>(pieces);
-                    int oldx = piece.getC().getX();
-                    int oldy = piece.getC().getY();
-                    deleteAt(move.getX(), move.getY());
-                    piece.setC(new Coordinate(move.getX(), move.getY()));
-                    //if any move gets the king out of check, it's not checkmate
-                    if(!isInCheck(isWhite)) {
-                        pieces = tempPieces;
-                        piece.setC(new Coordinate(oldx, oldy));
+                    boolean result = simulateMove(piece, move.getX(), move.getY());
+                    if(result) {
                         return false;
                     }
-                    pieces = tempPieces;
-                    piece.setC(new Coordinate(oldx, oldy));
                 }
             }
         }
